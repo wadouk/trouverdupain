@@ -1,44 +1,83 @@
 function initialize() {
-    var mapOptions = {
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 
-    if (navigator.geolocation)
-        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-    else
-        alert("Votre navigateur ne prend pas en compte la géolocalisation HTML5");
-
-    function successCallback(position) {
-        console.log("position", position);
-
-        var center = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-
-        var circle = new google.maps.Circle({
-            center: center,
-            radius: position.coords.accuracy,
-            map: map
-        });
-
-        console.log(circle.getBounds());
-        map.fitBounds(circle.getBounds());
-        map.setCenter(center);
-        circle.setMap(null);
-
+    function ajax(p) {
+        console.log('ajax', p);
+        var r = new XMLHttpRequest();
+        r.onreadystatechange = function () {
+            console.log('ajax d', r);
+            if (r.readyState != 4 || r.status != 200) return;
+            p.success(r);
+        };
+        r.open(p.verb || 'GET', p.url, true);
+        r.send();
     }
 
-    function errorCallback(error) {
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-                alert("L'utilisateur n'a pas autorisé l'accès à sa position");
-                break;
-            case error.POSITION_UNAVAILABLE:
-                alert("L'emplacement de l'utilisateur n'a pas pu être déterminé");
-                break;
-            case error.TIMEOUT:
-                alert("Le service n'a pas répondu à temps");
-                break;
+    function displayMarkers(r) {
+        function onEachFeature(feature, layer) {
+            if (feature.properties && feature.properties.popupContent) {
+                layer.bindPopup(feature.properties.popupContent);
+            }
         }
+
+        function interestingPartOfAddress(addr) {
+            try {
+                return addr.split(",")[0]
+            } catch (e) {
+                return addr;
+            }
+        }
+
+        function conge(num) {
+            //2007 Juillet Aout
+            //1      x
+            //2             x
+            var fullYear = new Date().getFullYear();
+            var congeAout2007 = (fullYear - 2007) % 2 == 0;
+            return (num == 2 && congeAout2007 ? "en Aout" : "en Juillet") + " (Groupe " + num + ")";
+        }
+
+        var points = JSON.parse(r.responseText);
+        var geojson = points.map(function (p) {
+            p.type = "Feature";
+            p.geometry = { type: "Point" };
+            var popupContent = interestingPartOfAddress(p.properties.address) +
+                "<br>" + p.properties.tel +
+                "<br>Congés " + conge(p.properties.conge) +
+                "<br>Fermeture le " + p.properties.fermeture;
+            return {
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: p.coordinates
+                },
+                properties: { popupContent: popupContent }
+            };
+        });
+        console.log(geojson);
+        L.geoJson({
+            features: geojson
+        }, {
+            onEachFeature: onEachFeature
+        }).addTo(map);
     }
+
+    function onLocationFound(e) {
+        console.log('onlocation', e);
+        L.circle(e.latlng, e.accuracy / 2).addTo(map);
+        ajax({
+            url: '/near', success: displayMarkers
+        });
+    }
+
+
+    console.log("init");
+    var map = L.map('map');
+    L.tileLayer('http://{s}.tile.cloudmade.com/553fcdd9327a493e847991b2074535c0/997/256/{z}/{x}/{y}.png', {
+        maxZoom: 18
+    }).addTo(map);
+    map.locate({setView: true, maxZoom: 16});
+    map.on('locationfound', onLocationFound);
 }
-google.maps.event.addDomListener(window, 'load', initialize);
+
+
+window.addEventListener('load', initialize);
