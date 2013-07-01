@@ -6,8 +6,28 @@ function initialize() {
             if (r.readyState != 4 || r.status != 200) return;
             p.success(r);
         };
+        function map2queryString(params) {
+            var queryString = [];
+            for (var i in params) {
+                if (params.hasOwnProperty(i)) {
+                    queryString.push(encodeURIComponent(i) + "=" + encodeURIComponent(params[i]));
+                }
+            }
+            return queryString.join("&");
+        }
+
+        var data = map2queryString(p.params);
+        if (!p.verb || p.verb === 'GET' && p.params) {
+            p.url = p.url + '?' + data;
+        }
+
         r.open(p.verb || 'GET', p.url, true);
-        r.send();
+
+        if (p.verb === 'POST') {
+            r.send(data);
+        } else {
+            r.send();
+        }
     }
 
     var bakeryIconOpen = L.icon({
@@ -73,9 +93,8 @@ function initialize() {
             p.type = "Feature";
             p.geometry = { type: "Point" };
             var popupContent = interestingPartOfAddress(p.properties.address) +
-                "<br>" + p.properties.tel +
-                "<br>Congés " + conge(p.properties.conge) +
-                "<br>Fermeture le " + p.properties.fermeture;
+                "<br>Fermeture le " + p.properties.fermeture +
+                "<br>Congés " + conge(p.properties.conge);
             return {
                 type: "Feature",
                 geometry: {
@@ -101,7 +120,9 @@ function initialize() {
     function onLocationFound(e) {
         L.circle(e.latlng, e.accuracy / 2).addTo(map);
         ajax({
-            url: '/near', success: displayMarkers
+            url: '/boulangeries', success: displayMarkers,
+            verb: 'GET',
+            params: {lat: e.latlng.lat, lng: e.latlng.lng}
         });
     }
 

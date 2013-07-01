@@ -37,9 +37,9 @@ http.createServer(app).listen(app.get('port'), function () {
 
 var controller = new Controller();
 
-app.get('/near', function (req, res) {
-    controller.near(function (err, docs) {
-        if (err) res.send(error);
+app.get('/boulangeries', function (req, res) {
+    controller.near(req.param("lat"), req.param("lng"), function (err, docs) {
+        if (err) res.send(err);
         else {
             res.json(docs);
         }
