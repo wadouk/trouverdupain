@@ -47,7 +47,8 @@ function initialize() {
 
         function interestingPartOfAddress(addr) {
             try {
-                return addr.split(",")[0]
+                var split = addr.split(",");
+                return addr.match(/Paris/i) ? split[0] : addr;
             } catch (e) {
                 return addr;
             }
@@ -94,6 +95,7 @@ function initialize() {
             p.type = "Feature";
             p.geometry = { type: "Point" };
             var popupContent = interestingPartOfAddress(p.properties.address) +
+                "<br> A " + Math.round(new L.LatLng(p.coordinates[1], p.coordinates[0]).distanceTo(center)) + "m de vous" +
                 "<br>Fermeture le " + p.properties.fermeture +
                 "<br>Congés " + conge(p.properties.conge);
             return {
@@ -118,8 +120,11 @@ function initialize() {
         }).addTo(map);
     }
 
+    var center;
+
     function onLocationFound(e) {
         L.circle(e.latlng, e.accuracy / 2).addTo(map);
+        center = e.latlng;
         ajax({
             url: '/boulangeries', success: displayMarkers,
             verb: 'GET',
