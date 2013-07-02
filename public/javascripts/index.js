@@ -30,12 +30,20 @@ function initialize() {
         }
     }
 
+    var iconUrlOpen = 'images/pitr_bakery_croissant.png';
+    var shadowUrl = 'images/pitr_bakery_croissant_shadow.png';
+    var iconUrlClose = 'images/pitr_bakery_croissant_close.png';
+
+    [iconUrlOpen, iconUrlClose, shadowUrl].forEach(function (url) {
+        new Image().src = url
+    });
+
     var bakeryIconOpen = L.icon({
-        iconUrl: 'images/pitr_bakery_croissant.png', iconAnchor: [16, 35], shadowUrl: 'images/pitr_bakery_croissant_shadow.png', shadowAnchor: [20, 31]
+        iconUrl: iconUrlOpen, iconAnchor: [16, 35], shadowUrl: shadowUrl, shadowAnchor: [20, 31]
 
     });
     var bakeryIconClose = L.icon({
-        iconUrl: 'images/pitr_bakery_croissant_close.png', iconAnchor: [16, 35], shadowUrl: 'images/pitr_bakery_croissant_shadow.png', shadowAnchor: [20, 31]
+        iconUrl: iconUrlClose, iconAnchor: [16, 35], shadowUrl: shadowUrl, shadowAnchor: [20, 31]
     });
 
     function displayMarkers(r) {
@@ -132,12 +140,18 @@ function initialize() {
         });
     }
 
-    var map = L.map('map');
-    L.tileLayer('http://{s}.tile.cloudmade.com/553fcdd9327a493e847991b2074535c0/100985/256/{z}/{x}/{y}.png', {
-        maxZoom: 18
-    }).addTo(map);
-    map.locate({setView: true, maxZoom: 16});
-    map.on('locationfound', onLocationFound);
+    function localize() {
+        document.getElementById("map").style.display = "block";
+        document.getElementById("welcome").style.display = "none";
+        map = L.map('map');
+        L.tileLayer('http://{s}.tile.cloudmade.com/553fcdd9327a493e847991b2074535c0/100985/256/{z}/{x}/{y}.png', {
+            maxZoom: 18
+        }).addTo(map);
+        map.locate({setView: true, maxZoom: 16});
+        map.on('locationfound', onLocationFound);
+    }
+
+    document.getElementById("welcome").addEventListener("click", localize);
 }
 
 
