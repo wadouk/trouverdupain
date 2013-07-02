@@ -151,7 +151,10 @@ function initialize() {
         map.on('locationfound', onLocationFound);
     }
 
-    document.getElementById("welcome").addEventListener("click", localize);
+    var elementsByTagName = document.getElementsByClassName("clickable");
+    for (var i = 0; i++; i < elementsByTagName.length) {
+        elementsByTagName.item(i).addEventListener("click", localize);
+    }
 }
 
 

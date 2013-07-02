@@ -11,7 +11,10 @@ html
 
 block content
   #welcome()
-        h1 Trouver les boulangeries ouvertes aux alentours
-        p En tenant compte des congés annuels et des jours de fermetures réglementaires en Île-de-France
-        p (Cliquer sur le texte)
+        h1.clickable Trouver les boulangeries ouvertes aux alentours
+        p.clickable En tenant compte des congés annuels et des jours de fermetures réglementaires en Île-de-France
+        p.clickable (Cliquer sur le texte)
+        #foot
+            a(href='http://github.com/wadouk/trouverdupain')
+                img(src='images/github.jpg')
   #map
