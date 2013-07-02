@@ -31,10 +31,11 @@ function initialize() {
     }
 
     var bakeryIconOpen = L.icon({
-        iconUrl: 'images/pitr_bakery_croissant.png'
+        iconUrl: 'images/pitr_bakery_croissant.png', iconAnchor: [16, 35], shadowUrl: 'images/pitr_bakery_croissant_shadow.png', shadowAnchor: [20, 31]
+
     });
     var bakeryIconClose = L.icon({
-        iconUrl: 'images/pitr_bakery_croissant_close.png'
+        iconUrl: 'images/pitr_bakery_croissant_close.png', iconAnchor: [16, 35], shadowUrl: 'images/pitr_bakery_croissant_shadow.png', shadowAnchor: [20, 31]
     });
 
     function displayMarkers(r) {
@@ -78,14 +79,14 @@ function initialize() {
             //2             x
             var fullYear = new Date().getFullYear();
             var congeAout2007 = (fullYear - 2007) % 2 == 0;
-            return (num == 2 && congeAout2007 ? 8 : 7);
+            return (num == 2 && congeAout2007 ? 7 : 6);
         }
 
         function conge(num) {
             //2007 Juillet Aout
             //1      x
             //2             x
-            return (congeMonth(num) === 8 ? "en Aout" : "en Juillet") + " (Groupe " + num + ")";
+            return (congeMonth(num) === 7 ? "en Aout" : "en Juillet") + " (Groupe " + num + ")";
         }
 
         var points = JSON.parse(r.responseText);

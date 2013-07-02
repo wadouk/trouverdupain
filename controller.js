@@ -16,7 +16,7 @@ controller.prototype.near = function (lat, lng, callback) {
     this.getCollection(function (error, collection) {
         if (error) (callback(error));
         else {
-            collection.find({"coordinates": {$near: [parseFloat(lng), parseFloat(lat)]}}, {type: false, _id: false, "properties.bie": false, "properties.tel": false}).toArray(callback);
+            collection.find({"coordinates": {$near: [parseFloat(lng), parseFloat(lat)]}}, {type: false, _id: false, "properties.bie": false, "properties.tel": false}, {limit: 20}).toArray(callback);
         }
     });
 };
