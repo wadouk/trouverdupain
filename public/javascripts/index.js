@@ -140,6 +140,8 @@ function initialize() {
         });
     }
 
+    var map;
+
     function localize() {
         document.getElementById("map").style.display = "block";
         document.getElementById("welcome").style.display = "none";
@@ -152,7 +154,7 @@ function initialize() {
     }
 
     var elementsByTagName = document.getElementsByClassName("clickable");
-    for (var i = 0; i++; i < elementsByTagName.length) {
+    for (var i = 0; i < elementsByTagName.length; i++) {
         elementsByTagName.item(i).addEventListener("click", localize);
     }
 }
