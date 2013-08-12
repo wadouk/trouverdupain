@@ -40,8 +40,13 @@ var controller = new Controller();
 app.get('/boulangeries', function (req, res) {
     controller.near(req.param("lat"), req.param("lng"), function (err, docs) {
         if (err) res.send(err);
-        else {
-            res.json(docs);
-        }
+        else res.json(docs);
     });
+});
+
+app.get('/geocode', function (req, res) {
+    controller.geocode(req.param("addr"), function (err, data) {
+        if (err) res.send(err);
+        else res.json(data);
+    })
 });

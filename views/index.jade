@@ -14,6 +14,9 @@ block content
         h1.clickable Trouver les boulangeries ouvertes aux alentours
         p.clickable En tenant compte des congés annuels et des jours de fermeture réglementaire en Île-de-France
         p.clickable (Cliquer sur le texte)
+        form(id='addrform')
+            input(type='text',id='addr',name='addr',placeholder='Une adresse')
+            button(type=button) Locate
         #foot
             a(href='http://github.com/wadouk/trouverdupain')
                 img(src='images/github.jpg')

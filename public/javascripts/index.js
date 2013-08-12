@@ -131,6 +131,7 @@ function initialize() {
     var center;
 
     function onLocationFound(e) {
+        clearTimeout(failTimeout);
         L.circle(e.latlng, e.accuracy / 2).addTo(map);
         center = e.latlng;
         ajax({
@@ -141,22 +142,96 @@ function initialize() {
     }
 
     var map;
+    var failTimeout;
+    var defaultLoc = {lat: 48.857558, lng: 2.340084};
+
+    function onLocationFail(e) {
+        map.setView(defaultLoc, 16);
+        center = defaultLoc;
+        ajax({
+            url: "/boulangeries", success: displayMarkers,
+            verb: 'GET',
+            params: defaultLoc
+        })
+    }
+
+    function firstControl() {
+        var control = new L.Control();
+        control.getContainer = function () {
+            return document.getElementById('addrform');
+        };
+        control.onAdd = function () {
+            return control.getContainer();
+        };
+        return control;
+    }
 
     function localize() {
         document.getElementById("map").style.display = "block";
         document.getElementById("welcome").style.display = "none";
         map = L.map('map');
+
         L.tileLayer('http://{s}.tile.cloudmade.com/553fcdd9327a493e847991b2074535c0/100985/256/{z}/{x}/{y}.png', {
             maxZoom: 18
         }).addTo(map);
-        map.locate({setView: true, maxZoom: 16});
+
+        firstControl().addTo(map);
         map.on('locationfound', onLocationFound);
+        map.on('locationerror', function (e) {
+            console.log("err", e);
+        });
+        var timeoutDelay = 0;
+        map.locate({setView: true, maxZoom: 16, timeout: timeoutDelay});
+        failTimeout = setTimeout(onLocationFail, timeoutDelay);
     }
 
-    var elementsByTagName = document.getElementsByClassName("clickable");
-    for (var i = 0; i < elementsByTagName.length; i++) {
-        elementsByTagName.item(i).addEventListener("click", localize);
+    function fetchMakersFromGeocode() {
+        ajax({url: "/geocode", success: displayMarkers,
+            verb: 'GET', params: {addr: document.querySelector("#addr").value}})
     }
+
+    function submitFieldOnEnter() {
+        document.querySelector("#addr").addEventListener("keydown", function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                fetchMakersFromGeocode();
+            }
+        });
+    }
+
+    submitFieldOnEnter();
+    var addrform = document.querySelector("#addrform");
+
+    function preventFormToBeSubmited() {
+        addrform.addEventListener("submit", function (e) {
+            e.preventDefault();
+        });
+    }
+
+    preventFormToBeSubmited();
+    function ifControlOnMapRestoreFocusable() {
+        addrform.addEventListener("mouseover", function () {
+            if (map) map.dragging.disable();
+        });
+        addrform.addEventListener("mouseout", function () {
+            if (map) map.dragging.enable();
+        });
+    }
+
+    ifControlOnMapRestoreFocusable();
+    document.querySelector("#addrform button").addEventListener("click", function (e) {
+        e.preventDefault();
+        fetchMakersFromGeocode();
+    });
+
+    function addClickable() {
+        var elementsByTagName = document.getElementsByClassName("clickable");
+        for (var i = 0; i < elementsByTagName.length; i++) {
+            elementsByTagName.item(i).addEventListener("click", localize);
+        }
+    }
+
+    addClickable();
 }
 
 

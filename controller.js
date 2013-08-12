@@ -1,6 +1,8 @@
 var mongo = require('mongodb'),
     Server = mongo.Server,
-    Db = mongo.Db;
+    Db = mongo.Db,
+    geocoder = require('geocoder');
+;
 
 var controller = function () {
     this.server = new Server('localhost', 27017, {auto_reconnect: true});
@@ -19,6 +21,18 @@ controller.prototype.near = function (lat, lng, callback) {
             collection.find({"coordinates": {$near: [parseFloat(lng), parseFloat(lat)]}}, {type: false, _id: false, "properties.bie": false, "properties.tel": false}, {limit: 20}).toArray(callback);
         }
     });
+};
+
+controller.prototype.geocode = function (addr, callback) {
+    var me = this;
+    geocoder.geocode(addr, function (err, data) {
+        if (data.status == 'OK') {
+            var location = data.results[0].geometry.location;
+            me.near(location.lat, location.lng, callback);
+        } else {
+            callback('NO_ADDR');
+        }
+    })
 };
 
 exports.controller = controller;
