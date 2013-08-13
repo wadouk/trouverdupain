@@ -16,9 +16,13 @@ controller.prototype.getCollection = function (callback) {
 
 controller.prototype.near = function (lat, lng, callback) {
     this.getCollection(function (error, collection) {
+        function extracted(error,data) {
+            return callback(null,{center:{lat:parseFloat(lat), lng:parseFloat(lng)}, markers:data});
+        }
+
         if (error) (callback(error));
         else {
-            collection.find({"coordinates": {$near: [parseFloat(lng), parseFloat(lat)]}}, {type: false, _id: false, "properties.bie": false, "properties.tel": false}, {limit: 20}).toArray(callback);
+            collection.find({"coordinates": {$near: [parseFloat(lng), parseFloat(lat)]}}, {type: false, _id: false, "properties.bie": false, "properties.tel": false}, {limit: 20}).toArray(extracted);
         }
     });
 };
