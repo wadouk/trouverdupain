@@ -103,9 +103,10 @@ function initialize() {
             p.type = "Feature";
             p.geometry = { type: "Point" };
             var popupContent = interestingPartOfAddress(p.properties.address) +
-                "<br> A " + Math.round(new L.LatLng(p.coordinates[1], p.coordinates[0]).distanceTo(center)) + "m de vous" +
+                (center ? "<br> A " + Math.round(new L.LatLng(p.coordinates[1], p.coordinates[0]).distanceTo(center)) + "m de vous":"") +
                 "<br>Fermeture le " + p.properties.fermeture +
                 "<br>Congés " + conge(p.properties.conge);
+            // TODO congés pas toujours renseignés
             return {
                 type: "Feature",
                 geometry: {
@@ -130,8 +131,14 @@ function initialize() {
 
     var center;
 
-    function onLocationFound(e) {
+    function clearTimeoutLocate() {
         clearTimeout(failTimeout);
+        failTimeout = null;
+        delete failTimeout;
+    }
+
+    function onLocationFound(e) {
+        clearTimeoutLocate();
         L.circle(e.latlng, e.accuracy / 2).addTo(map);
         center = e.latlng;
         ajax({
@@ -146,8 +153,7 @@ function initialize() {
     var defaultLoc = {lat: 48.857558, lng: 2.340084};
 
     function onLocationFail(e) {
-        map.setView(defaultLoc, 16);
-        center = defaultLoc;
+        clearTimeout(failTimeout);
         ajax({
             url: "/boulangeries", success: displayMarkers,
             verb: 'GET',
@@ -177,9 +183,7 @@ function initialize() {
 
         firstControl().addTo(map);
         map.on('locationfound', onLocationFound);
-        map.on('locationerror', function (e) {
-            console.log("err", e);
-        });
+        map.on('locationerror', onLocationFail);
         var timeoutDelay = 0;
         map.locate({setView: true, maxZoom: 16, timeout: timeoutDelay});
         failTimeout = setTimeout(onLocationFail, timeoutDelay);
