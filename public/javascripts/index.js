@@ -98,8 +98,8 @@ function initialize() {
             return (congeMonth(num) === 7 ? "en Aout" : "en Juillet") + " (Groupe " + num + ")";
         }
 
-        var points = JSON.parse(r.responseText);
-        var geojson = points.map(function (p) {
+        var response = JSON.parse(r.responseText);
+        var geojson = response.markers.map(function (p) {
             p.type = "Feature";
             p.geometry = { type: "Point" };
             var popupContent = interestingPartOfAddress(p.properties.address) +
@@ -118,14 +118,14 @@ function initialize() {
                 }
             };
         });
-        L.geoJson({
+        map.fitBounds(L.geoJson({
             features: geojson
         }, {
             pointToLayer: function (feature, latlng) {
                 return L.marker(latlng, {icon: isClose(feature.properties) ? bakeryIconClose : bakeryIconOpen});
             },
             onEachFeature: onEachFeature
-        }).addTo(map);
+        }).addTo(map).getBounds());
     }
 
     var center;
