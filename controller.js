@@ -16,8 +16,8 @@ controller.prototype.getCollection = function (callback) {
 
 controller.prototype.near = function (lat, lng, callback) {
     this.getCollection(function (error, collection) {
-        function extracted(error,data) {
-            return callback(null,{center:{lat:parseFloat(lat), lng:parseFloat(lng)}, markers:data});
+        function extracted(error, data) {
+            return callback(null, {center: {lat: parseFloat(lat), lng: parseFloat(lng)}, markers: data});
         }
 
         if (error) (callback(error));
@@ -29,14 +29,19 @@ controller.prototype.near = function (lat, lng, callback) {
 
 controller.prototype.geocode = function (addr, callback) {
     var me = this;
-    geocoder.geocode(addr, function (err, data) {
-        if (data.status == 'OK') {
-            var location = data.results[0].geometry.location;
-            me.near(location.lat, location.lng, callback);
-        } else {
-            callback('NO_ADDR');
-        }
-    })
+    if (!addr) {
+        callback('EMPTY');
+    } else {
+        geocoder.geocode(addr, function (err, data) {
+            if (data.status && data.status == 'OK') {
+                var location = data.results[0].geometry.location;
+                me.near(location.lat, location.lng, callback);
+            } else {
+                callback('NO_ADDR');
+            }
+        })
+    }
+
 };
 
 exports.controller = controller;
