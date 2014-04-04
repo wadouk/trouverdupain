@@ -189,7 +189,7 @@ function initialize() {
         document.getElementById("welcome").style.display = "none";
         map = L.map('map');
 
-        L.tileLayer('http://{s}.tile.cloudmade.com/553fcdd9327a493e847991b2074535c0/100985/256/{z}/{x}/{y}.png', {
+        L.tileLayer('https://{s}.tiles.mapbox.com/v3/wadouk.hn2hnhp0/{z}/{x}/{y}.png', {
             maxZoom: 18
         }).addTo(map);
 
