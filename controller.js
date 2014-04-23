@@ -10,7 +10,7 @@ var controller = function () {
 };
 
 controller.prototype.getCollection = function (callback) {
-    this.db.collection('geoboulang', callback);
+    this.db.collection('geoboulang_osm', callback);
 };
 
 

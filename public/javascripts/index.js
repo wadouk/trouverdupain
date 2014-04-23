@@ -125,11 +125,18 @@ function initialize() {
         var markers = response.markers.map(function (p) {
             p.type = "Feature";
             p.geometry = { type: "Point" };
-            var popupContent = interestingPartOfAddress(p.properties.address) +
-                "<br> A " + Math.round(new L.LatLng(p.coordinates[1], p.coordinates[0]).distanceTo(response.center)) + "m de vous" +
-                "<br>Fermeture le " + p.properties.fermeture +
-                "<br>Congés " + conge(p.properties.conge);
-            // TODO congés pas toujours renseignés
+            var popupContent = [{v:interestingPartOfAddress(p.properties.address),f:p.properties.address},
+                    {v:p.properties.name,f:p.properties.name},
+                    {l:"A ",v:Math.round(new L.LatLng(p.coordinates[1], p.coordinates[0]).distanceTo(response.center)) + "m de vous",f:true},
+                    {l:"Fermeture le ", v:p.properties.fermeture,f:p.properties.fermeture},
+                    {l:"Ouverture",v: p.properties.opening_hours,f: p.properties.opening_hours},
+                    {l:"Congés ",v:conge(p.properties.conge),f:p.properties.conge}
+            ].filter(function (e) {
+                return typeof(e.f) != "undefined";
+            }).map(function (e) {
+                return e.l ? e.l + " " + e.v : e.v;
+            }).join("<br>");
+
             return {
                 type: "Feature",
                 geometry: {
