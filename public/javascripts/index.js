@@ -1,5 +1,6 @@
 function initialize() {
 
+    var conges = require("./conges");
     function ajax(p) {
         var r = new XMLHttpRequest();
         r.onreadystatechange = function () {
@@ -70,42 +71,6 @@ function initialize() {
             }
         }
 
-        function numJourFermeture(fermeture) {
-            return [
-                "Dimanche",
-                "Lundi",
-                "Mardi",
-                "Mercredi",
-                "Jeudi",
-                "Vendredi",
-                "Samedi"
-            ].indexOf(fermeture);
-        }
-
-        function isClose(properties) {
-            var numJourFermeture2 = numJourFermeture(properties.fermeture);
-            var congeMonth2 = congeMonth(properties.conge);
-            var b = (numJourFermeture2 === new Date().getDay() || congeMonth2 === new Date().getMonth());
-            return ( b)
-        }
-
-
-        function congeMonth(num) {
-            //2007 Juillet Aout
-            //1      x
-            //2             x
-            var fullYear = new Date().getFullYear();
-            var congeAout2007 = (fullYear - 2007) % 2 == 0;
-            return (num == 2 && congeAout2007 ? 7 : 6);
-        }
-
-        function conge(num) {
-            //2007 Juillet Aout
-            //1      x
-            //2             x
-            return (congeMonth(num) === 7 ? "en Aout" : "en Juillet") + " (Groupe " + num + ")";
-        }
-
         function clearLayers() {
             while (layers.length != 0) {
                 map.removeLayer(layers.pop());
@@ -130,7 +95,7 @@ function initialize() {
                     {l:"A ",v:Math.round(new L.LatLng(p.coordinates[1], p.coordinates[0]).distanceTo(response.center)) + "m de vous",f:true},
                     {l:"Fermeture le ", v:p.properties.fermeture,f:p.properties.fermeture},
                     {l:"Ouverture",v: p.properties.opening_hours,f: p.properties.opening_hours},
-                    {l:"Congés ",v:conge(p.properties.conge),f:p.properties.conge}
+                    {l:"Congés ",v:conges.conge(p.properties.conge),f:p.properties.conge}
             ].filter(function (e) {
                 return typeof(e.f) != "undefined";
             }).map(function (e) {
@@ -153,7 +118,7 @@ function initialize() {
             features: markers
         }, {
             pointToLayer: function (feature, latlng) {
-                return L.marker(latlng, {icon: isClose(feature.properties) ? bakeryIconClose : bakeryIconOpen});
+                return L.marker(latlng, {icon: conges.isClose(feature.properties) ? bakeryIconClose : bakeryIconOpen});
             },
             onEachFeature: onEachFeature
         }));
