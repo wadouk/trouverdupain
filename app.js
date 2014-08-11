@@ -7,6 +7,7 @@ var express = require('express')
     , user = require('./routes/user')
     , http = require('http')
     , path = require('path')
+    , browserify = require('browserify')
     , Controller = require('./controller').controller;
 
 var app = express();
@@ -22,6 +23,16 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(require('stylus').middleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+var b = browserify();
+b.add('./public/vendor/easy-button.js');
+b.add('./public/javascripts/merge.js');
+b.add('./public/javascripts/conges.js');
+b.add('./public/javascripts/index.js');
+app.get('/bundle.js', function (req,res) {
+    res.set('Content-Type','application/javascript');
+    b.bundle().pipe(res);
+});
 
 // development only
 if ('development' == app.get('env')) {
