@@ -1,23 +1,24 @@
 {
-    "name": "application-name",
-    "version": "0.0.1",
-    "private": true,
-    "scripts": {
-        "start": "node app.js"
-        , "tests" : "node_modules/mocha/bin/mocha -w -u bdd"
-        , "run" : "node_modules/watchify/bin/cmd.js public/javascripts/conges.js public/javascripts/index.js public/javascripts/merge.js -o public/javascripts/browser.js"
-    },
-    "dependencies": {
-        "express": "3.2.5",
-        "jade": "*",
-        "stylus": "*",
-        "mongodb": "1.1.4",
-        "geocoder": "0.1.0",
-        "nodemon": "*"
-    }, "devDependencies" : {
-        "mocha":"*"
-        , "should":"*"
-        , "browserify":"*"
-        , "watchify" : "*"
-    }
+  "name": "trouverdupain",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+    "tests": "node_modules/mocha/bin/mocha -w -u bdd tests",
+    "build": "node_modules/watchify/bin/cmd.js public/vendor/easy-button.js public/javascripts/conges.js public/javascripts/index.js public/javascripts/merge.js -o public/javascripts/browser.js"
+  },
+  "dependencies": {
+    "express": "3.2.5",
+    "jade": "0.32.0",
+    "stylus": "0.33.1",
+    "mongodb": "1.1.4",
+    "geocoder": "0.1.0",
+    "nodemon": "1.2.1"
+  },
+  "devDependencies": {
+    "mocha": "1.20.1",
+    "should": "4.0.4",
+    "browserify": "4.2.0",
+    "watchify": "0.10.2"
+  }
 }

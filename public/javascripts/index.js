@@ -1,6 +1,7 @@
 function initialize() {
 
     var conges = require("./conges");
+    var pointMerger = require("./pointMerger");
     function ajax(p) {
         var r = new XMLHttpRequest();
         r.onreadystatechange = function () {
@@ -87,15 +88,17 @@ function initialize() {
 
         layers.push(new L.marker(response.center).bindPopup(nvl(getSearchCriteria(), 'Votre position')).addTo(map));
         initSearchCriteria();
-        var markers = response.markers.map(function (p) {
+        var markers = pointMerger.mergeNearPoints(response.markers).map(function (p) {
             p.type = "Feature";
             p.geometry = { type: "Point" };
-            var popupContent = [{v:interestingPartOfAddress(p.properties.address),f:p.properties.address},
+            var popupContent = [
                     {v:p.properties.name,f:p.properties.name},
+                    {v:interestingPartOfAddress(p.properties.address),f:p.properties.address},
                     {l:"A ",v:Math.round(new L.LatLng(p.coordinates[1], p.coordinates[0]).distanceTo(response.center)) + "m de vous",f:true},
                     {l:"Fermeture le ", v:p.properties.fermeture,f:p.properties.fermeture},
                     {l:"Ouverture",v: p.properties.opening_hours,f: p.properties.opening_hours},
                     {l:"Congés ",v:conges.conge(p.properties.conge),f:p.properties.conge}
+                    //, {l: "pos", v: p.coordinates, f:p.coordinates}
             ].filter(function (e) {
                 return typeof(e.f) != "undefined";
             }).map(function (e) {
@@ -157,8 +160,6 @@ function initialize() {
     }
 
     function initMap(callback) {
-        document.getElementById("map").style.display = "block";
-        document.getElementById("welcome").style.display = "none";
         map = L.map('map');
 
         L.tileLayer('https://{s}.tiles.mapbox.com/v3/wadouk.hn2hnhp0/{z}/{x}/{y}.png', {
@@ -205,15 +206,7 @@ function initialize() {
         });
     }
 
-    function addClickable() {
-        var elementsByTagName = document.getElementsByClassName("clickable");
-        for (var i = 0; i < elementsByTagName.length; i++) {
-            elementsByTagName.item(i).addEventListener("click", function () {
-                initMap(localize);
-            });
-        }
-    }
-
+    initMap(localize);
     submitFieldOnEnter();
     var addrform = document.querySelector("#addrform");
     preventFormToBeSubmited();
@@ -226,9 +219,6 @@ function initialize() {
             initMap(fetchMakersFromGeocode);
         }
     });
-
-
-    addClickable();
 }
 
 
