@@ -1,3 +1,4 @@
+"use strict";
 function initialize() {
 
     var conges = require("./conges");
@@ -53,7 +54,6 @@ function initialize() {
     function clearTimeoutLocate() {
         clearTimeout(failTimeout);
         failTimeout = null;
-        delete failTimeout;
     }
 
     function displayMarkers(r) {
@@ -130,7 +130,8 @@ function initialize() {
 
     function onLocationFound(e) {
         clearTimeoutLocate();
-        L.circle(e.latlng, e.accuracy / 2).addTo(map);
+        document.querySelector(".tp-locator").classList.remove("fa-spin");
+        document.querySelector(".tp-locator").style.color = 'black';
 
         ajax({
             url: '/boulangeries', success: displayMarkers,
@@ -139,8 +140,10 @@ function initialize() {
         });
     }
 
-    function onLocationFail() {
+    function loadDefaultQuery() {
         clearTimeoutLocate();
+        document.querySelector(".tp-locator").classList.remove("fa-spin");
+        document.querySelector(".tp-locator").style.color = 'black';
         ajax({
             url: "/boulangeries", success: displayMarkers,
             verb: 'GET'
@@ -167,15 +170,20 @@ function initialize() {
         }).addTo(map);
 
         controlSearch().addTo(map);
+        L.easyButton("fa-location-arrow tp-locator",localize,"Localize",map);
+        loadDefaultQuery();
         callback();
     }
 
     function localize() {
+        document.querySelector(".tp-locator").classList.add("fa-spin");
+        document.querySelector(".tp-locator").style.color = 'blue';
         map.on('locationfound', onLocationFound);
-        map.on('locationerror', onLocationFail);
+        map.on('locationerror', loadDefaultQuery);
         var timeoutDelay = 10 * 1000;
         map.locate({setView: true, maxZoom: 16, timeout: timeoutDelay});
-        failTimeout = setTimeout(onLocationFail, timeoutDelay);
+        failTimeout = setTimeout(loadDefaultQuery, timeoutDelay);
+        // TODO still double request to default query
     }
 
     function getSearchCriteria() {
