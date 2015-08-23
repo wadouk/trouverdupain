@@ -172,14 +172,16 @@ function initialize() {
         controlSearch().addTo(map);
         L.easyButton("fa-location-arrow tp-locator",localize,"Localize",map);
         loadDefaultQuery();
+
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', loadDefaultQuery);
+
         callback();
     }
 
     function localize() {
         document.querySelector(".tp-locator").classList.add("fa-spin");
         document.querySelector(".tp-locator").style.color = 'blue';
-        map.on('locationfound', onLocationFound);
-        map.on('locationerror', loadDefaultQuery);
         var timeoutDelay = 10 * 1000;
         map.locate({setView: true, maxZoom: 16, timeout: timeoutDelay});
         failTimeout = setTimeout(loadDefaultQuery, timeoutDelay);
