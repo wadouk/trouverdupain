@@ -25,8 +25,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var b = browserify();
 b.add('./public/vendor/easy-button.js');
-b.add('./public/javascripts/merge.js');
-b.add('./public/javascripts/conges.js');
 b.add('./public/javascripts/index.js');
 app.get('/bundle.js', function (req,res) {
     res.set('Content-Type','application/javascript');
