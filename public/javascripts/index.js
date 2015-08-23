@@ -3,6 +3,7 @@ function initialize() {
 
     var conges = require("./conges");
     var pointMerger = require("./pointMerger");
+    var ga = require("./ga");
     function ajax(p) {
         var r = new XMLHttpRequest();
         r.onreadystatechange = function () {
@@ -57,6 +58,7 @@ function initialize() {
     }
 
     function displayMarkers(r) {
+        ga("send","event","displayMarkers");
         function onEachFeature(feature, layer) {
             if (feature.properties && feature.properties.popupContent) {
                 layer.bindPopup(feature.properties.popupContent);
@@ -129,6 +131,7 @@ function initialize() {
     }
 
     function onLocationFound(e) {
+        ga("send","event","localisation","found");
         clearTimeoutLocate();
         document.querySelector(".tp-locator").classList.remove("fa-spin");
         document.querySelector(".tp-locator").style.color = 'black';
@@ -142,6 +145,9 @@ function initialize() {
 
     function loadDefaultQuery() {
         clearTimeoutLocate();
+
+        ga("send","event","localisation","default");
+
         document.querySelector(".tp-locator").classList.remove("fa-spin");
         document.querySelector(".tp-locator").style.color = 'black';
         ajax({
@@ -176,10 +182,13 @@ function initialize() {
         map.on('locationfound', onLocationFound);
         map.on('locationerror', loadDefaultQuery);
 
+        ga("send","pageview","map");
         callback();
     }
 
     function localize() {
+
+        ga("send","event","localisation","request");
         document.querySelector(".tp-locator").classList.add("fa-spin");
         document.querySelector(".tp-locator").style.color = 'blue';
         var timeoutDelay = 10 * 1000;
@@ -197,6 +206,8 @@ function initialize() {
     }
 
     function fetchMakersFromGeocode() {
+
+        ga("send","event","geocode","request");
         ajax({url: "/geocode", success: displayMarkers,
             verb: 'GET', params: {addr: getSearchCriteria()}})
     }
