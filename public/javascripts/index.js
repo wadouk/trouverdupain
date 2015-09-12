@@ -172,7 +172,8 @@ function initialize() {
         map = L.map('map');
 
         L.tileLayer('https://{s}.tiles.mapbox.com/v3/wadouk.hn2hnhp0/{z}/{x}/{y}.png', {
-            maxZoom: 18
+            maxZoom: 18,
+            attribution: "© <a href='https://www.mapbox.com/map-feedback/'>Mapbox</a> | © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap contributors</a>"
         }).addTo(map);
 
         controlSearch().addTo(map);
